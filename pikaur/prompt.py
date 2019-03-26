@@ -11,7 +11,7 @@ from .core import interactive_spawn, get_editor
 from .i18n import _
 from .pprint import (
     color_line, print_stderr, get_term_width, range_printable,
-    PrintLock,
+    PrintLock, print_warning,
 )
 from .exceptions import SysExit
 
