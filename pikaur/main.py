@@ -78,6 +78,20 @@ def init_output_encoding() -> None:
 init_output_encoding()
 
 
+def init_proxy() -> None:
+    proxy = PikaurConfig().network.get_str('Socks5Proxy')
+    if proxy:  # pragma: no cover
+        port = 1080
+        idx = proxy.find(':')
+        if idx >= 0:
+            port = int(proxy[idx + 1:])
+            proxy = proxy[:idx]
+
+        import socks  # pylint: disable=import-error
+        socks.set_default_proxy(socks.PROXY_TYPE_SOCKS5, proxy, port)
+        socket.socket = socks.socksocket
+
+
 def cli_print_upgradeable() -> None:
     args = parse_args()
     updates: List[InstallInfo] = []
@@ -183,17 +197,7 @@ def cli_print_version() -> None:
 def cli_entry_point() -> None:
     # pylint: disable=too-many-branches
 
-    proxy = PikaurConfig().network.get_str('Socks5Proxy')
-    if proxy:
-        port = 1080
-        idx = proxy.find(':')
-        if idx >= 0:
-            port = int(proxy[idx + 1:])
-            proxy = proxy[:idx]
-
-        import socks  # pylint: disable=import-error
-        socks.set_default_proxy(socks.PROXY_TYPE_SOCKS5, proxy, port)
-        socket.socket = socks.socksocket
+    init_proxy()
 
     # operations are parsed in order what the less destructive (like info and query)
     # are being handled first, for cases when user by mistake
