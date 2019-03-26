@@ -191,7 +191,7 @@ def cli_entry_point() -> None:
             port = int(proxy[idx + 1:])
             proxy = proxy[:idx]
 
-        import socks
+        import socks  # pylint: disable=import-error
         socks.set_default_proxy(socks.PROXY_TYPE_SOCKS5, proxy, port)
         socket.socket = socks.socksocket
 
