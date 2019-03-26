@@ -12,6 +12,7 @@ import codecs
 import shutil
 import atexit
 import io
+import socket
 from argparse import ArgumentError  # pylint: disable=no-name-in-module
 from typing import List, Optional, Callable, NoReturn
 
@@ -181,6 +182,18 @@ def cli_print_version() -> None:
 
 def cli_entry_point() -> None:
     # pylint: disable=too-many-branches
+
+    proxy = PikaurConfig().network.get_str('Socks5Proxy')
+    if proxy:
+        port = 1080
+        idx = proxy.find(':')
+        if idx >= 0:
+            port = int(proxy[idx + 1:])
+            proxy = proxy[:idx]
+
+        import socks
+        socks.set_default_proxy(socks.PROXY_TYPE_SOCKS5, proxy, port)
+        socket.socket = socks.socksocket
 
     # operations are parsed in order what the less destructive (like info and query)
     # are being handled first, for cases when user by mistake
